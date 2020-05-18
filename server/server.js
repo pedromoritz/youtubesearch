@@ -23,7 +23,8 @@ app.post('/api/search', (req, res) => {
   youTubePageToken = null;
   youTubePagingCounter = 0;
 
-  /* this is for mocking results to avoid youtube api quota exhaust too fast
+  /* this is for mocking results to avoid youtube api quota exhaust too fast */
+  /*
   getHowManyDays(mockData, req.body.maxMinutesSunToSat);
   res.send({
     videos: mockData,
