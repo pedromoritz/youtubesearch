@@ -23,24 +23,23 @@ app.post('/api/search', (req, res) => {
   youTubePageToken = null;
   youTubePagingCounter = 0;
 
+  /* this is for mocking results to avoid youtube api quota exhaust too fast
   getHowManyDays(mockData, req.body.maxMinutesSunToSat);
-
   res.send({
     videos: mockData,
     fiveMostFrequentWords: utils.getFiveMostFrequentWords(mockData),
     howManyDays: days.length
   });
+  */
 
-
-  // getBunchOfVideos(req.body.searchTerm, youTubePageToken, result => {
-  //   getHowManyDays(result, req.body.maxMinutesSunToSat);
-  //   console.log(days);
-  //   res.send({
-  //     videos: result,
-  //     fiveMostFrequentWords: utils.getFiveMostFrequentWords(result),
-  //     howManyDays: days.length
-  //   });
-  // })
+  getBunchOfVideos(req.body.searchTerm, youTubePageToken, result => {
+    getHowManyDays(result, req.body.maxMinutesSunToSat);
+    res.send({
+      videos: result,
+      fiveMostFrequentWords: utils.getFiveMostFrequentWords(result),
+      howManyDays: days.length
+    });
+  })
 
 });
 
@@ -119,7 +118,7 @@ const getBunchOfVideos = (searchTerm, youTubePageToken, callback) => {
     part: 'snippet',
     type: 'video',
     q: searchTerm,
-    maxResults: 50,
+    maxResults: 1,
     order: 'date',
     safeSearch: 'moderate',
     videoEmbeddable: true
@@ -129,8 +128,6 @@ const getBunchOfVideos = (searchTerm, youTubePageToken, callback) => {
     } else {
       youTubePagingCounter++;
       youTubePageToken = response.data.nextPageToken;
-      console.log(youTubePagingCounter);
-      console.log(youTubePageToken);
 
       let ids = response.data.items.map(item => {
         return item.id.videoId;
@@ -143,8 +140,13 @@ const getBunchOfVideos = (searchTerm, youTubePageToken, callback) => {
         })
 
         for (var i = 0; i < response.data.items.length; i++) {
-          response.data.items[i].snippet.duration = contentDetails[i].duration;
-          response.data.items[i].snippet.durationMinutes = youTubeDurationToMinutes(contentDetails[i].duration);
+          if (contentDetails[i]) {
+            response.data.items[i].snippet.duration = contentDetails[i].duration;
+            response.data.items[i].snippet.durationMinutes = youTubeDurationToMinutes(contentDetails[i].duration);            
+          } else {
+            response.data.items[i].snippet.duration = '';
+            response.data.items[i].snippet.durationMinutes = 0;                        
+          }
         }
 
         youTubeSearchResults = youTubeSearchResults.concat(response.data.items);

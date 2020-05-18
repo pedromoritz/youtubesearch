@@ -8,9 +8,12 @@ class App extends Component {
     response: '',
     searchTerm: '',
     data: '',
-    size: 0,
+    size: '-',
     videos: [],
     rawBody: '',
+    howManyDays: '-',
+    fiveMostFrequentWords: '-',
+    loading: false,
     maxSunMinutes: 0,
     maxMonMinutes: 0,
     maxTueMinutes: 0,
@@ -22,6 +25,12 @@ class App extends Component {
 
   handleSubmit = async e => {
     e.preventDefault();
+
+    this.setState({ howManyDays: '-' });
+    this.setState({ fiveMostFrequentWords: '-' });
+    this.setState({ size: '-' });
+    this.setState({ loading: true });
+
     const response = await fetch('/api/search', {
       method: 'POST',
       headers: {
@@ -42,12 +51,14 @@ class App extends Component {
     });
     const body = await response.text();
 
+    this.setState({ loading: false });
+
     let bodyObj = JSON.parse(body);
     this.setState({ size: bodyObj.videos.length });
     this.setState({ fiveMostFrequentWords: bodyObj.fiveMostFrequentWords });
     this.setState({ howManyDays: bodyObj.howManyDays });
-    //this.setState({ rawBody: body });
-    //this.setState({ videos: JSON.parse(body) });
+    this.setState({ rawBody: body });
+    this.setState({ videos: bodyObj.videos });
   };
 
   render() {
@@ -60,11 +71,8 @@ class App extends Component {
         </header>
         <p>{this.state.response}</p>
         <form onSubmit={this.handleSubmit}>
-          <p>
-            <strong>YouTube Search</strong>
-          </p>
 
-          Max Sun Minutes:&nbsp; 
+          Max Sunday Minutes:&nbsp; 
           <input 
             type="number"
             value={this.state.maxSunMinutes}
@@ -72,7 +80,7 @@ class App extends Component {
           />
           <br /><br />
 
-          Max Mon Minutes:&nbsp; 
+          Max Monday Minutes:&nbsp; 
           <input 
             type="number"
             value={this.state.maxMonMinutes}
@@ -80,7 +88,7 @@ class App extends Component {
           />
           <br /><br />
 
-          Max Tue Minutes:&nbsp; 
+          Max Tuesday Minutes:&nbsp; 
           <input 
             type="number"
             value={this.state.maxTueMinutes}
@@ -88,7 +96,7 @@ class App extends Component {
           />
           <br /><br />
 
-          Max Wed Minutes:&nbsp; 
+          Max Wednesday Minutes:&nbsp; 
           <input 
             type="number"
             value={this.state.maxWedMinutes}
@@ -96,7 +104,7 @@ class App extends Component {
           />
           <br /><br />
 
-          Max Thu Minutes:&nbsp; 
+          Max Thursday Minutes:&nbsp; 
           <input 
             type="number"
             value={this.state.maxThuMinutes}
@@ -104,7 +112,7 @@ class App extends Component {
           />
           <br /><br />
 
-          Max Fri Minutes:&nbsp; 
+          Max Friday Minutes:&nbsp; 
           <input 
             type="number"
             value={this.state.maxFriMinutes}
@@ -112,7 +120,7 @@ class App extends Component {
           />
           <br /><br />
 
-          Max Sat Minutes:&nbsp; 
+          Max Saturday Minutes:&nbsp; 
           <input 
             type="number"
             value={this.state.maxSatMinutes}
@@ -129,6 +137,12 @@ class App extends Component {
           <button type="submit">Search</button>
         </form>
         <p>
+        {this.state.loading ? <span>Loading...</span> : <span>&nbsp;</span>}
+        <br />
+          <b>Videos found:</b><br />
+          {this.state.size}<br /><br />
+        </p>
+        <p>
           <b>Five most used words in titles and descriptions of the result:</b><br />
           {this.state.fiveMostFrequentWords}<br /><br />
         </p>
@@ -136,10 +150,8 @@ class App extends Component {
           <b>How many days are needed to watch all the vídeos returned:</b><br />
           {this.state.howManyDays}<br /><br />
         </p>
-        <p>{this.state.size}</p>
+        <VideoList videos={this.state.videos} />
         <p>{this.state.rawBody}</p>
-        <VideoList 
-          videos={this.state.videos} />
       </div>
     );
   }
