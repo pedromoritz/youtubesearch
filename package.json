@@ -1,0 +1,19 @@
+{
+  "name": "youtubesearch",
+  "version": "0.0.1",
+  "description": "YouTube Search interface",
+  "author": {
+    "name": "Pedro Moritz de Carvalho Neto",
+    "email": "pmoritz@yahoo.com"
+  },
+  "license": "MIT",
+  "scripts": {
+    "client": "cd client && yarn start",
+    "server": "cd server && nodemon server.js",
+    "dev": "concurrently --kill-others-on-fail \"yarn server\" \"yarn client\""
+  },
+  "devDependencies": {
+    "concurrently": "^5.1.0"
+  },
+  "dependencies": {}
+}
