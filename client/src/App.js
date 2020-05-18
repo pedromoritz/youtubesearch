@@ -30,6 +30,7 @@ class App extends Component {
     this.setState({ fiveMostFrequentWords: '-' });
     this.setState({ size: '-' });
     this.setState({ loading: true });
+    this.setState({ videos: [] });
 
     const response = await fetch('/api/search', {
       method: 'POST',
@@ -151,7 +152,6 @@ class App extends Component {
           {this.state.howManyDays}<br /><br />
         </p>
         <VideoList videos={this.state.videos} />
-        <p>{this.state.rawBody}</p>
       </div>
     );
   }

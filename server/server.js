@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const {google} = require('googleapis');
-const youtubeV3 = google.youtube({version: 'v3', auth: 'AIzaSyCNWg0p8kaQ-RrR3cADpuXafQtHiFSjWI0'});
+const youtubeV3 = google.youtube({version: 'v3', auth: 'AIzaSyBd1_gIvpsqpufsZrFgJLhfkVFpNPN2ccU'});
 const utils = require('./utils');
 
 let mockData = require('./mock.json');
@@ -118,7 +118,7 @@ const getBunchOfVideos = (searchTerm, youTubePageToken, callback) => {
     part: 'snippet',
     type: 'video',
     q: searchTerm,
-    maxResults: 1,
+    maxResults: 50,
     order: 'date',
     safeSearch: 'moderate',
     videoEmbeddable: true
@@ -154,7 +154,11 @@ const getBunchOfVideos = (searchTerm, youTubePageToken, callback) => {
         if (youTubePagingCounter > 3) {
           callback(youTubeSearchResults);
         } else {
-          getBunchOfVideos(searchTerm, youTubePageToken, callback);
+          if (response.data.items.length < 50) {
+            callback(youTubeSearchResults);
+          } else {
+            getBunchOfVideos(searchTerm, youTubePageToken, callback);            
+          }
         }
 
       });
